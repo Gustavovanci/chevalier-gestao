@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, query, orderBy, doc, setDoc, getDoc, where, deleteDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -14,6 +14,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// --- VERIFICAÇÃO DE DISPOSITIVO E PERSISTÊNCIA ---
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+// Se for celular (PWA), guarda a sessão para sempre. Se for PC, desloga ao fechar a aba.
+setPersistence(auth, isMobile ? browserLocalPersistence : browserSessionPersistence)
+  .catch((error) => console.error("Erro na persistência de auth:", error));
+
+const splashScreen = document.getElementById("splash-screen");
 
 // Persistência Offline
 enableIndexedDbPersistence(db).catch((err) => console.warn("Aviso: Persistência offline não suportada.", err.code));
@@ -57,12 +66,23 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-screen").style.display = "flex";
     await carregarDadosSaaS(user.uid);
+    
+    // Oculta a Splash Screen suavemente DEPOIS de carregar os dados
+    setTimeout(() => {
+      if(splashScreen) splashScreen.classList.add("hidden");
+    }, 600); // 600ms garante que a tela por trás já se desenhou
+    
   } else {
     if (unsubscribeTransacoes) unsubscribeTransacoes();
     if (unsubscribeFuncionarios) unsubscribeFuncionarios();
     document.getElementById("login-screen").style.display = "flex";
     document.getElementById("app-screen").style.display = "none";
     toggleLoading(false);
+    
+    // Oculta a Splash Screen para revelar a tela de Login
+    setTimeout(() => {
+      if(splashScreen) splashScreen.classList.add("hidden");
+    }, 600);
   }
 });
 
