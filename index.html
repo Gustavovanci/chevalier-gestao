@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>Chevalier Gestão</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="loading" class="loading-overlay visible">
+    <div
+      style="width: 100%; max-width: 600px; padding: 24px; display: flex; flex-direction: column; gap: 24px; margin-top: 60px;">
+      <div class="skeleton" style="height: 40px; width: 60%; border-radius: 8px;"></div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="skeleton" style="height: 110px; border-radius: 16px;"></div>
+        <div class="skeleton" style="height: 110px; border-radius: 16px;"></div>
+        <div class="skeleton" style="height: 110px; border-radius: 16px;"></div>
+      </div>
+      <div class="skeleton" style="height: 200px; width: 100%; border-radius: 20px;"></div>
+    </div>
+  </div>
+
+  <div id="modal-equipe" class="modal-overlay" onclick="fecharModal(event, 'modal-equipe')">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3>Gerenciar Equipe</h3>
+        <button class="close-icon" onclick="document.getElementById('modal-equipe').classList.remove('open')">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-grid">
+        <button class="modal-action-btn" onclick="navegarEquipe('novo')">
+          <div class="icon-circle purple"><i class="ph-fill ph-user-plus"></i></div>
+          <span>Cadastrar Novo</span>
+        </button>
+        <button class="modal-action-btn" onclick="navegarEquipe('lista')">
+          <div class="icon-circle blue"><i class="ph-fill ph-users-three"></i></div>
+          <span>Ver Lista</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-detalhes" class="modal-overlay" onclick="fecharModal(event, 'modal-detalhes')">
+    <div class="bottom-sheet large">
+      <div class="sheet-handle"></div>
+
+      <div class="sheet-header">
+        <h3 id="detalhe-nome">Funcionário</h3>
+        <button class="close-icon" onclick="document.getElementById('modal-detalhes').classList.remove('open')">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div class="detalhe-resumo">
+        <div class="resumo-box grey">
+          <small>Total em Vales</small>
+          <strong id="detalhe-total-vale">R$ 0,00</strong>
+        </div>
+        <div class="resumo-box green">
+          <small>Total em Salários</small>
+          <strong id="detalhe-total-pag">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <h4 class="sheet-subtitle">Histórico Completo</h4>
+      <div id="lista-historico-detalhado" class="history-list"></div>
+    </div>
+  </div>
+
+  <div id="modal-perfil" class="modal-overlay" onclick="fecharModal(event, 'modal-perfil')">
+    <div class="bottom-sheet large">
+      <div class="sheet-handle"></div>
+
+      <div class="sheet-header">
+        <h3 id="perfil-nome">Perfil</h3>
+        <button class="close-icon" onclick="document.getElementById('modal-perfil').classList.remove('open')">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div class="perfil-grid">
+        <div class="perfil-box">
+          <small>Telefone</small>
+          <strong id="perfil-cel">—</strong>
+        </div>
+        <div class="perfil-box">
+          <small>RG</small>
+          <strong id="perfil-rg">—</strong>
+        </div>
+        <div class="perfil-box wide">
+          <small>Endereço</small>
+          <strong id="perfil-endereco">—</strong>
+        </div>
+        <div class="perfil-box">
+          <small>Data de Entrada</small>
+          <strong id="perfil-entrada">—</strong>
+        </div>
+      </div>
+
+      <div class="perfil-actions">
+        <button id="btn-perfil-wpp" class="btn-secondary">
+          <i class="ph-fill ph-whatsapp-logo"></i> Chamar
+        </button>
+        <button id="btn-perfil-pdf" class="btn-secondary">
+          <i class="ph-bold ph-file-pdf"></i> Imprimir PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="login-screen" class="screen active">
+    <div class="bg-glow"></div>
+
+    <div class="login-container">
+      <div class="login-header">
+        <div class="logo-mark">
+          <i class="ph-fill ph-infinity"></i>
+        </div>
+        <h1>CHEVALIER</h1>
+        <p>Acesso Seguro</p>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="input-flat">
+          <input type="email" id="email" placeholder="E-mail corporativo" required autocomplete="email" />
+        </div>
+        <div class="input-flat">
+          <input type="password" id="password" placeholder="Senha" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn-login">Entrar na Conta</button>
+      </form>
+      
+      <p class="login-footer">
+        <i class="ph-fill ph-lock-key" style="margin-right: 4px;"></i>
+        Protegido com criptografia de ponta-a-ponta
+      </p>
+    </div>
+  </div>
+
+  <div id="app-screen" class="screen" style="display:none;">
+    <header class="top-bar">
+      <div class="header-left">
+        <div class="greeting">Olá, <span id="nome-empresa-header">Empresa</span></div>
+        <div class="header-sub" id="header-subtitle">Gestão Financeira</div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-toggle-eye" class="btn-icon" title="Ocultar valores"><i class="ph ph-eye"></i></button>
+        <button id="btn-logout" class="btn-icon" title="Sair"><i class="ph ph-sign-out"></i></button>
+      </div>
+    </header>
+
+    <main class="content-scroll">
+      <div class="limit-container">
+
+        <section id="view-home" class="view-section active">
+          <div class="dash-header">
+            <h2 class="page-title">Visão Geral</h2>
+            <div class="date-filter">
+              <button class="filter-chip" id="btn-filtro-mesant" onclick="window.filtrarDash('mes_ant')">Mês
+                Ant.</button>
+              <button class="filter-chip active" id="btn-filtro-mes" onclick="window.filtrarDash('mes')">Atual</button>
+              <button class="filter-chip" id="btn-filtro-tudo" onclick="window.filtrarDash('tudo')">Tudo</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi-card grey">
+              <div class="kpi-icon"><i class="ph-fill ph-wallet"></i></div>
+              <p>Total Gasto</p>
+              <h3 id="dash-total" class="money-text">R$ 0,00</h3>
+            </div>
+            <div class="kpi-card grey">
+              <div class="kpi-icon"><i class="ph-fill ph-hand-coins"></i></div>
+              <p>Vales</p>
+              <h3 id="dash-vales" class="money-text">R$ 0,00</h3>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-icon"><i class="ph-fill ph-money"></i></div>
+              <p>Salários</p>
+              <h3 id="dash-salarios" class="money-text">R$ 0,00</h3>
+            </div>
+          </div>
+
+          <div class="chart-box">
+            <div class="chart-header">
+              <h4>Distribuição</h4>
+              <select id="sel-chart" class="mini-select">
+                <option value="todos" selected>Ambos</option>
+                <option value="vale">Apenas Vales</option>
+                <option value="pag">Apenas Salários</option>
+              </select>
+            </div>
+            <div class="chart-stage">
+              <canvas id="mainChart"></canvas>
+              <div id="chart-empty" class="chart-empty hidden">Sem dados no período.</div>
+            </div>
+          </div>
+
+          <h3 class="section-title">Resumo por Colaborador</h3>
+          <div id="lista-agrupada" class="transation-list">
+          </div>
+
+          <div class="action-buttons-grid">
+            <button class="btn-action-outline" onclick="window.exportarCSV()">
+              <i class="ph-bold ph-microsoft-excel-logo" style="color: var(--green);"></i> Exportar Relatório
+            </button>
+            <button class="btn-action-outline" onclick="window.nav('config')">
+              <i class="ph-bold ph-gear"></i> Configurações
+            </button>
+          </div>
+        </section>
+
+        <section id="view-lancar" class="view-section">
+          <h2 class="page-title">Novo Lançamento</h2>
+          <div class="form-card">
+            <label>Colaborador</label>
+            <select id="sel-func" class="premium-input"></select>
+
+            <label>Tipo de Operação</label>
+            <div class="toggle-type">
+              <input type="radio" name="tipo" id="t-vale" value="Vale" checked />
+              <label for="t-vale">Adiantamento / Vale</label>
+              <input type="radio" name="tipo" id="t-pag" value="Pagamento" />
+              <label for="t-pag">Pagamento de Salário</label>
+            </div>
+
+            <label style="margin-top:24px;">Valor (R$)</label>
+            <input type="text" inputmode="numeric" id="inp-valor" class="money-input" placeholder="0,00" />
+
+            <button id="btn-salvar-transacao" class="btn-nu full">Confirmar e Notificar</button>
+          </div>
+        </section>
+
+        <section id="view-func-novo" class="view-section">
+          <div class="page-header-back">
+            <button onclick="window.nav('home')" class="btn-back"><i class="ph-bold ph-arrow-left"></i></button>
+            <h2>Novo Colaborador</h2>
+          </div>
+          <div class="form-card">
+            <label>Nome Completo</label>
+            <input type="text" id="novo-func-nome" class="premium-input" placeholder="Ex.: João da Silva" />
+
+            <label>WhatsApp (Apenas números)</label>
+            <input type="tel" id="novo-func-cel" class="premium-input" placeholder="Ex.: 11999998888" />
+
+            <label>RG / Documento</label>
+            <input type="text" id="novo-func-rg" class="premium-input" placeholder="Opcional" />
+
+            <label>Endereço</label>
+            <input type="text" id="novo-func-endereco" class="premium-input" placeholder="Opcional" />
+
+            <label>Data de Entrada</label>
+            <input type="date" id="novo-func-entrada" class="premium-input" />
+
+            <button id="btn-salvar-func" class="btn-nu full" style="margin-top: 16px;">Salvar Cadastro</button>
+          </div>
+        </section>
+
+        <section id="view-func-lista" class="view-section">
+          <div class="page-header-back">
+            <button onclick="window.nav('home')" class="btn-back"><i class="ph-bold ph-arrow-left"></i></button>
+            <h2>Quadro de Equipe</h2>
+          </div>
+
+          <div style="padding: 0 4px 16px 4px;">
+            <div class="search-bar">
+              <i class="ph ph-magnifying-glass"></i>
+              <input type="text" id="busca-equipe" placeholder="Buscar colaborador..."
+                onkeyup="window.filtrarEquipe()" />
+            </div>
+          </div>
+
+          <div id="lista-funcionarios" class="team-list"></div>
+        </section>
+
+        <section id="view-config" class="view-section">
+          <div class="page-header-back">
+            <button onclick="window.nav('home')" class="btn-back"><i class="ph-bold ph-arrow-left"></i></button>
+            <h2>Configurações</h2>
+          </div>
+          <div class="form-card">
+            <label>Nome da Empresa (Aparece no App e WhatsApp)</label>
+            <input type="text" id="config-empresa-nome" class="premium-input" />
+            <button id="btn-salvar-config" class="btn-nu full" style="margin-top:16px;">Salvar Alteração</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="window.nav('home')">
+        <i class="ph-fill ph-house"></i><span>Início</span>
+      </button>
+      <button class="nav-item fab" onclick="window.nav('lancar')">
+        <i class="ph-bold ph-plus"></i>
+      </button>
+      <button class="nav-item" onclick="abrirModal('modal-equipe')">
+        <i class="ph-fill ph-users-three"></i><span>Equipe</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+  </script>
+  <script type="module" src="./app.js"></script>
+</body>
+
+</html>
