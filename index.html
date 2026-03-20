@@ -17,22 +17,67 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body { background-color: #000000; margin: 0; }
+    #splash-screen {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100dvh; background-color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 999999; transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.5s;
+    }
+    #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .splash-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; animation: pulseLogo 2s infinite ease-in-out; }
+    .splash-logo {
+      width: 90px; height: 90px; margin: 0; margin-bottom: 24px; background: linear-gradient(135deg, #141414, #222222);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.9);
+    }
+    .splash-title { font-size: 1.5rem; font-weight: 800; letter-spacing: 5px; color: #ffffff; font-family: "Inter", sans-serif; margin: 0; }
+    .bg-glow-splash {
+      position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(130, 10, 209, 0.15) 0%, rgba(0,0,0,0) 70%);
+      top: -150px; right: -150px; border-radius: 50%; z-index: 0; pointer-events: none;
+    }
+    .splash-footer-inline {
+      position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10;
+    }
+    .splash-footer-inline p { color: rgba(255,255,255,0.5); font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; font-family: "Inter", sans-serif; margin-top: 0;}
+    .splash-footer-inline .brand-credits { display: flex; align-items: center; gap: 4px; font-family: "Inter", sans-serif;}
+    .brand-credits span { color: rgba(255,255,255,0.2); font-size: 0.8rem; font-weight: 500; }
+    .brand-credits strong {
+      background: linear-gradient(135deg, #ffffff, #a1a1aa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;
+    }
+    @keyframes pulseLogo { 
+      0% { transform: scale(0.98); opacity: 0.8; filter: drop-shadow(0 0 10px rgba(255,255,255,0.05)); } 
+      50% { transform: scale(1.02); opacity: 1; filter: drop-shadow(0 0 25px rgba(255,255,255,0.15)); } 
+      100% { transform: scale(0.98); opacity: 0.8; filter: drop-shadow(0 0 10px rgba(255,255,255,0.05)); } 
+    }
+  </style>
 </head>
 
 <body>
-  <div id="splash-screen" class="splash-screen">
-    <div class="bg-glow"></div>
+  <div id="splash-screen">
+    <div class="bg-glow-splash"></div>
     <div class="splash-content">
-      <div class="logo-mark splash-logo">
-        <i class="ph-fill ph-infinity"></i>
+      <div class="splash-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="url(#gradSplash)" viewBox="0 0 256 256">
+          <defs>
+            <linearGradient id="gradSplash" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#a1a1aa;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <path d="M248,128a56.06,56.06,0,0,1-56,56c-20.94,0-40.45-12.38-54.87-34.78-14.42,22.4-33.93,34.78-54.87,34.78a56,56,0,1,1,0-112c20.94,0,40.45,12.38,54.87,34.78,14.42-22.4,33.93-34.78,54.87-34.78A56.06,56.06,0,0,1,248,128Zm-56-40c-15.65,0-31,10.23-43,28.85a153.3,153.3,0,0,0-13,24.84,153.3,153.3,0,0,0,13,24.84c12,18.62,27.35,28.85,43,28.85a40,40,0,1,0,0-80ZM82.26,166.85c-12-18.62-27.35-28.85-43-28.85a40,40,0,1,0,0,80c15.65,0,31-10.23,43-28.85a153.3,153.3,0,0,0,13-24.84A153.3,153.3,0,0,0,82.26,166.85Z"></path>
+        </svg>
       </div>
+      <h1 class="splash-title">CHEVALIER</h1>
     </div>
-    <div class="splash-footer">
+    <div class="splash-footer-inline">
       <p>Chevalier Gestão</p>
       <div class="brand-credits">
         <span>By</span>
         <strong>NexuFlow</strong>
-        <span class="year">2026</span>
+        <span style="color: rgba(255,255,255,0.2); font-size: 0.75rem; margin-left: 2px;">2026</span>
       </div>
     </div>
   </div>
