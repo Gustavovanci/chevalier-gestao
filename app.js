@@ -70,7 +70,7 @@ onAuthStateChanged(auth, async (user) => {
     // Oculta a Splash Screen suavemente DEPOIS de carregar os dados
     setTimeout(() => {
       if(splashScreen) splashScreen.classList.add("hidden");
-    }, 600); // 600ms garante que a tela por trás já se desenhou
+    }, 2000); // 2000ms garante tempo de tela para a abertura
     
   } else {
     if (unsubscribeTransacoes) unsubscribeTransacoes();
@@ -82,7 +82,7 @@ onAuthStateChanged(auth, async (user) => {
     // Oculta a Splash Screen para revelar a tela de Login
     setTimeout(() => {
       if(splashScreen) splashScreen.classList.add("hidden");
-    }, 600);
+    }, 1500);
   }
 });
 

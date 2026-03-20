@@ -177,7 +177,6 @@ body {
   flex-direction: column;
   align-items: center;
   animation: pulseLogo 2s infinite ease-in-out;
-  margin-top: auto;
 }
 
 .splash-logo {
