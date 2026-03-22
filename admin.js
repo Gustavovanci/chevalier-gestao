@@ -52,12 +52,19 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    loginScreen.style.display = "none";
-    appScreen.style.display = "flex";
-    iniciarMonitoramentoGlobal();
+    // Transição Suave Premium
+    loginScreen.classList.remove("active");
+    setTimeout(() => {
+      appScreen.classList.add("active");
+      iniciarMonitoramentoGlobal();
+    }, 300); // Aguarda a tela de login sumir para revelar o painel
+    
   } else {
-    loginScreen.style.display = "flex";
-    appScreen.style.display = "none";
+    appScreen.classList.remove("active");
+    setTimeout(() => {
+      loginScreen.classList.add("active");
+    }, 300);
+    
     if (unsubscribeMetrics) unsubscribeMetrics();
     toggleLoading(false);
   }
