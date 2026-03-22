@@ -66,7 +66,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-screen").style.display = "flex";
     await carregarDadosSaaS(user.uid);
-    await atualizarMetricasAdmin(user.uid);
+    // Ping removido daqui, pois será chamado de dentro do carregarDadosSaaS!
     
     // Oculta a Splash Screen suavemente DEPOIS de carregar os dados
     setTimeout(() => {

@@ -133,9 +133,8 @@ function iniciarMonitoramentoGlobal() {
   unsubscribeMetrics = onSnapshot(metricsRef, (snapshot) => {
     let totalEmpresas = 0;
     let totalVidas = 0;
+    let totalOperacoesSaas = 0;
     let empresasHtml = "";
-
-    // Convertemos para array para ordenar pela data de acesso (mais recentes primeiro)
     const empresasAtivas = [];
 
     snapshot.forEach(doc => {
@@ -144,20 +143,21 @@ function iniciarMonitoramentoGlobal() {
         uid: doc.id,
         empresa: data.empresa || "Sem Nome",
         funcionarios: data.total_funcionarios || 0,
+        operacoes: data.total_operacoes || 0,
         lastActive: data.last_active || null
       });
     });
 
-    // Ordenar por lastActive DESC (Quem entrou mais recentemente aparece em cima)
-    empresasAtivas.sort((a, b) => {
-      if (!a.lastActive) return 1;
-      if (!b.lastActive) return -1;
-      return new Date(b.lastActive) - new Date(a.lastActive);
-    });
+    empresasAtivas.sort((a, b) => new Date(b.lastActive || 0) - new Date(a.lastActive || 0));
 
     empresasAtivas.forEach(emp => {
       totalEmpresas++;
       totalVidas += emp.funcionarios;
+      totalOperacoesSaas += emp.operacoes;
+
+      const hoje = new Date();
+      const ultimoAcesso = new Date(emp.lastActive);
+      const isHot = (hoje - ultimoAcesso) < (24 * 60 * 60 * 1000);
 
       empresasHtml += `
         <tr>
@@ -165,22 +165,22 @@ function iniciarMonitoramentoGlobal() {
             <div class="empresa-tag">
               <div class="tag-icon"><i class="ph-fill ph-storefront"></i></div>
               <strong>${emp.empresa}</strong>
+              ${isHot ? '<span title="Acessou hoje" style="color:var(--accent-green); font-size:10px;">●</span>' : ''}
             </div>
           </td>
           <td><i class="ph-fill ph-users" style="color: var(--text-dim); margin-right: 6px;"></i> ${emp.funcionarios}</td>
+          <td><i class="ph-fill ph-swap" style="color: var(--text-dim); margin-right: 6px;"></i> ${emp.operacoes} logs</td>
           <td>${formatarDataHora(emp.lastActive)}</td>
           <td><span class="uid-cell">${emp.uid.substring(0, 8)}...</span></td>
         </tr>
       `;
     });
 
-    // Atualiza HUD
     document.getElementById("dash-empresas").innerText = totalEmpresas;
     document.getElementById("dash-vidas").innerText = totalVidas;
     
-    // Atualiza Tabela
     if (empresasAtivas.length === 0) {
-      document.getElementById("lista-empresas").innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-dim); padding: 40px;">Nenhum inquilino detectado pela telemetria.</td></tr>`;
+      document.getElementById("lista-empresas").innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 40px;">Sem dados de telemetria.</td></tr>`;
     } else {
       document.getElementById("lista-empresas").innerHTML = empresasHtml;
     }
@@ -189,6 +189,6 @@ function iniciarMonitoramentoGlobal() {
   }, (error) => {
     console.error("Erro ao ler métricas:", error);
     toggleLoading(false);
-    Swal.fire("Alerta de Permissão", "Suas regras do Firestore não permitem a leitura da raiz 'nexuflow_metrics'. Autentique-se como admin no Firebase Console.", "warning");
+    Swal.fire("Acesso Negado", "Você não tem permissão para ler o painel mestre.", "warning");
   });
 }
