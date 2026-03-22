@@ -15,13 +15,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Lista de e-mails autorizados para acessar o painel (Segurança Básica de Front-end)
-// NOTA: Para segurança real, crie uma regra no Firestore que apenas estes UIDs possam ler 'nexuflow_metrics'.
+// Lista de e-mails autorizados para acessar o painel
 const AUTHORIZED_ADMINS = [
-  "admin@nexuflow.com",
-  "gustavo@nexuflow.com",
-  "gustavovanci@gmail.com",
-  "gusta.vanci@gmail.com"
+  "vancigustavo@gmail.com"
 ];
 
 // Elements
@@ -42,13 +38,16 @@ setPersistence(auth, browserLocalPersistence);
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    // Validar se é você (Dono da Holding)
-    // Se quiser ignorar essa trava, comente o IF abaixo.
-    // if (!AUTHORIZED_ADMINS.includes(user.email)) {
-    //   signOut(auth);
-    //   Swal.fire("Acesso Negado", "Sua credencial não possui nível de Comando Master.", "error");
-    //   return;
-    // }
+    // Validação da Identidade Master
+    if (!AUTHORIZED_ADMINS.includes(user.email)) {
+      signOut(auth);
+      Swal.fire({
+        title: "Acesso Protegido",
+        text: "Sua conta é padrão. Painel restrito ao Master da NexuFlow.",
+        icon: "error"
+      });
+      return;
+    }
 
     loginScreen.style.display = "none";
     appScreen.style.display = "flex";
