@@ -71,15 +71,24 @@
 
     <main class="dashboard-content">
       
-      <!-- KPIs -->
       <section class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-icon brand-gradient">
+          <div class="kpi-icon brand-gradient" style="background: linear-gradient(135deg, #3f3f46, #18181b);">
             <i class="ph-duotone ph-buildings"></i>
           </div>
           <div class="kpi-info">
-            <p>Empresas Ativas</p>
-            <h3 id="dash-empresas">--</h3>
+            <p>Base Total (Cadastrados)</p>
+            <h3 id="dash-base-total">0</h3>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon brand-gradient" style="background: linear-gradient(135deg, #10b981, #047857);">
+            <i class="ph-duotone ph-broadcast"></i>
+          </div>
+          <div class="kpi-info">
+            <p>Online Agora (Tempo Real)</p>
+            <h3 id="dash-online-agora" style="color: #10b981;">0</h3>
           </div>
         </div>
         
@@ -89,46 +98,44 @@
           </div>
           <div class="kpi-info">
             <p>Vidas Gerenciadas</p>
-            <h3 id="dash-vidas">--</h3>
+            <h3 id="dash-vidas">0</h3>
           </div>
         </div>
-        
+
         <div class="kpi-card">
-          <div class="kpi-icon brand-gradient" style="background: linear-gradient(135deg, #10b981, #047857);">
-            <i class="ph-duotone ph-activity"></i>
+          <div class="kpi-icon brand-gradient">
+            <i class="ph-duotone ph-swap"></i>
           </div>
           <div class="kpi-info">
-            <p>Status da Nuvem</p>
-            <h3 style="color: #10b981;">Online</h3>
+            <p>Operações Processadas</p>
+            <h3 id="dash-operacoes">0</h3>
           </div>
         </div>
       </section>
 
-      <!-- TABLE DE ENGAJAMENTO -->
       <div class="table-card">
         <div class="table-header">
-          <h3>Mapeamento de Inquilinos (Tenants)</h3>
-          <p>Lista em tempo real dos clientes conectados ao Chevalier SaaS.</p>
+          <h3>Mapeamento de Inquilinos (Radar)</h3>
+          <p>Monitoramento cruzado: Base total de clientes vs. Telemetria ativa.</p>
         </div>
         
         <div class="table-responsive">
           <table class="admin-table">
             <thead>
               <tr>
+                <th>Status</th>
                 <th>Empresa (Fantasia)</th>
-                <th>Funcionários (Base)</th>
-                <th>Operações (Escala)</th>
+                <th>Funcionários</th>
+                <th>Operações</th>
                 <th>Último Ping (Acesso)</th>
                 <th>UID</th>
               </tr>
             </thead>
             <tbody id="lista-empresas">
-              <!-- JS RENDERIZA AQUI -->
-            </tbody>
+              </tbody>
           </table>
         </div>
       </div>
-
     </main>
   </div>
 

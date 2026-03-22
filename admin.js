@@ -32,6 +32,7 @@ function toggleLoading(show) {
 }
 
 let unsubscribeMetrics = null;
+let unsubscribeUsers = null;
 
 // --- AUTH LOGIC ---
 setPersistence(auth, browserLocalPersistence);
@@ -66,6 +67,7 @@ onAuthStateChanged(auth, async (user) => {
     }, 300);
     
     if (unsubscribeMetrics) unsubscribeMetrics();
+    if (unsubscribeUsers) unsubscribeUsers();
     toggleLoading(false);
   }
 });
@@ -117,6 +119,8 @@ document.getElementById("btn-logout").addEventListener("click", () => {
     confirmButtonText: 'Sim, sair'
   }).then((result) => {
     if (result.isConfirmed) {
+      if (unsubscribeMetrics) unsubscribeMetrics();
+      if (unsubscribeUsers) unsubscribeUsers();
       signOut(auth);
     }
   });
@@ -136,66 +140,124 @@ function iniciarMonitoramentoGlobal() {
   toggleLoading(true);
 
   const metricsRef = collection(db, "nexuflow_metrics");
+  const usersRef = collection(db, "users");
   
-  unsubscribeMetrics = onSnapshot(metricsRef, (snapshot) => {
-    let totalEmpresas = 0;
+  // Variáveis para guardar o estado dos dois bancos
+  let baseClientes = {};
+  let telemetria = {};
+
+  // Função central que cruza os dados e desenha a tela
+  function renderizarRadar() {
+    let totalBase = 0;
+    let totalOnlineAgora = 0;
     let totalVidas = 0;
     let totalOperacoesSaas = 0;
     let empresasHtml = "";
-    const empresasAtivas = [];
+    
+    const listaFinal = [];
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      empresasAtivas.push({
-        uid: doc.id,
-        empresa: data.empresa || "Sem Nome",
-        funcionarios: data.total_funcionarios || 0,
-        operacoes: data.total_operacoes || 0,
-        lastActive: data.last_active || null
+    // 1. Pega todo mundo que está na base de usuários (cadastrados)
+    for (const uid in baseClientes) {
+      const cliente = baseClientes[uid];
+      const metrica = telemetria[uid] || {}; // Se não tiver métrica, retorna vazio
+
+      listaFinal.push({
+        uid: uid,
+        empresa: cliente.empresa || "Sem Nome Configurado",
+        funcionarios: metrica.total_funcionarios || 0,
+        operacoes: metrica.total_operacoes || 0,
+        lastActive: metrica.last_active || null
       });
-    });
+    }
 
-    empresasAtivas.sort((a, b) => new Date(b.lastActive || 0) - new Date(a.lastActive || 0));
+    // 2. Ordena a lista: Quem tá online primeiro, inativos por último
+    listaFinal.sort((a, b) => new Date(b.lastActive || 0) - new Date(a.lastActive || 0));
 
-    empresasAtivas.forEach(emp => {
-      totalEmpresas++;
+    // 3. Monta a tabela e os cálculos
+    listaFinal.forEach(emp => {
+      totalBase++;
       totalVidas += emp.funcionarios;
       totalOperacoesSaas += emp.operacoes;
 
-      const hoje = new Date();
-      const ultimoAcesso = new Date(emp.lastActive);
-      const isHot = (hoje - ultimoAcesso) < (24 * 60 * 60 * 1000);
+      // Inteligência de Status
+      const agora = new Date();
+      let statusClass = "offline";
+      let statusText = "Inativo";
+      
+      if (emp.lastActive) {
+        const ultimoAcesso = new Date(emp.lastActive);
+        const minutosInativo = (agora - ultimoAcesso) / (1000 * 60);
+
+        if (minutosInativo <= 15) {
+          statusClass = "online";
+          statusText = "Online";
+          totalOnlineAgora++; // Conta pro KPI principal!
+        } else if (minutosInativo <= 1440) { // 24 horas = 1440 mins
+          statusClass = "away";
+          statusText = "Ausente";
+        }
+      }
 
       empresasHtml += `
         <tr>
           <td>
+            <div class="status-badge ${statusClass}">
+              <div class="status-dot"></div>
+              ${statusText}
+            </div>
+          </td>
+          <td>
             <div class="empresa-tag">
               <div class="tag-icon"><i class="ph-fill ph-storefront"></i></div>
               <strong>${emp.empresa}</strong>
-              ${isHot ? '<span title="Acessou hoje" style="color:var(--accent-green); font-size:10px;">●</span>' : ''}
             </div>
           </td>
           <td><i class="ph-fill ph-users" style="color: var(--text-dim); margin-right: 6px;"></i> ${emp.funcionarios}</td>
           <td><i class="ph-fill ph-swap" style="color: var(--text-dim); margin-right: 6px;"></i> ${emp.operacoes} logs</td>
-          <td>${formatarDataHora(emp.lastActive)}</td>
+          <td style="color: ${statusClass === 'offline' ? 'var(--text-dim)' : 'var(--text-main)'};">
+            ${formatarDataHora(emp.lastActive)}
+          </td>
           <td><span class="uid-cell">${emp.uid.substring(0, 8)}...</span></td>
         </tr>
       `;
     });
 
-    document.getElementById("dash-empresas").innerText = totalEmpresas;
+    // 4. Atualiza os KPIs
+    document.getElementById("dash-base-total").innerText = totalBase;
+    document.getElementById("dash-online-agora").innerText = totalOnlineAgora;
     document.getElementById("dash-vidas").innerText = totalVidas;
+    document.getElementById("dash-operacoes").innerText = totalOperacoesSaas;
     
-    if (empresasAtivas.length === 0) {
-      document.getElementById("lista-empresas").innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 40px;">Sem dados de telemetria.</td></tr>`;
+    // 5. Atualiza a Tabela
+    if (listaFinal.length === 0) {
+      document.getElementById("lista-empresas").innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim); padding: 40px;">Sua base de clientes está vazia.</td></tr>`;
     } else {
       document.getElementById("lista-empresas").innerHTML = empresasHtml;
     }
+  }
 
-    toggleLoading(false);
+  // --- LISTENERS SIMULTÂNEOS ---
+  
+  // A. Escuta todos os usuários criados
+  unsubscribeUsers = onSnapshot(usersRef, (snapshot) => {
+    baseClientes = {};
+    snapshot.forEach(doc => {
+      baseClientes[doc.id] = { empresa: doc.data().empresa };
+    });
+    renderizarRadar(); // Atualiza a tela
+    toggleLoading(false); // Só tira o loading quando os usuários chegarem
   }, (error) => {
-    console.error("Erro ao ler métricas:", error);
+    console.error("Erro Users:", error);
     toggleLoading(false);
-    Swal.fire("Acesso Negado", "Você não tem permissão para ler o painel mestre.", "warning");
+    Swal.fire("Acesso Negado", "Sem permissão na base de usuários.", "error");
+  });
+
+  // B. Escuta a Telemetria (Quem tá online)
+  unsubscribeMetrics = onSnapshot(metricsRef, (snapshot) => {
+    telemetria = {};
+    snapshot.forEach(doc => {
+      telemetria[doc.id] = doc.data();
+    });
+    renderizarRadar(); // Atualiza a tela
   });
 }

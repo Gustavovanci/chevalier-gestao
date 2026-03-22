@@ -78,3 +78,43 @@ form label { display: block; color: var(--text-dim); font-size: 0.8rem; font-wei
 .tag-icon { width: 32px; height: 32px; background: var(--bg-deep); border: 1px solid var(--stroke-1); border-radius: 6px; display: flex; justify-content: center; align-items: center; color: var(--text-dim); }
 .uid-cell { font-family: monospace; color: var(--text-dim); background: var(--bg-deep); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--stroke-1); }
 .status-hot { color: var(--accent-green); font-weight: 700; }
+
+/* --- STATUS INDICATORS (RADAR FINTECH) --- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--surface-2);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Online (< 15 minutos) */
+.status-badge.online { color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
+.status-badge.online .status-dot { background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulse-green 2s infinite; }
+
+/* Ausente (< 24 horas) */
+.status-badge.away { color: #eab308; background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); }
+.status-badge.away .status-dot { background: #eab308; }
+
+/* Inativo / Nunca logou */
+.status-badge.offline { color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--stroke-1); }
+.status-badge.offline .status-dot { background: #52525b; }
+
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.empresa-tag strong { font-size: 0.95rem; }
