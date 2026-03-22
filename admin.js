@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -38,8 +38,11 @@ setPersistence(auth, browserLocalPersistence);
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    // Validação da Identidade Master
-    if (!AUTHORIZED_ADMINS.includes(user.email)) {
+    // Validação da Identidade Master (case-insensitive)
+    const normalizedUserEmail = user.email.trim().toLowerCase();
+    const isMaster = AUTHORIZED_ADMINS.map(e => e.trim().toLowerCase()).includes(normalizedUserEmail);
+
+    if (!isMaster) {
       signOut(auth);
       Swal.fire({
         title: "Acesso Protegido",
@@ -63,14 +66,36 @@ onAuthStateChanged(auth, async (user) => {
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   toggleLoading(true);
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   
   signInWithEmailAndPassword(auth, email, password)
     .catch((err) => {
-      toggleLoading(false);
-      console.error(err);
-      Swal.fire("Bloqueado", "Credencial Master Incorreta ou Inexistente.", "error");
+      // Se não existir o usuário e for o e-mail master, criar automaticamente
+      const normalizedEmail = email.toLowerCase();
+      const isMaster = AUTHORIZED_ADMINS.map(e => e.trim().toLowerCase()).includes(normalizedEmail);
+      
+      if (err.code === 'auth/user-not-found' && isMaster) {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            Swal.fire({
+              title: "Sinal Master Reconhecido",
+              text: "A credencial da NexuFlow foi ativada na Criptografia Global. Acesso Liberado.",
+              icon: "success",
+              timer: 3000,
+              showConfirmButton: false
+            });
+          })
+          .catch((createErr) => {
+            toggleLoading(false);
+            console.error("AutoRegistry Error:", createErr);
+            Swal.fire("Falha de Criação Mestra", createErr.message, "error");
+          });
+      } else {
+        toggleLoading(false);
+        console.error("Login Error:", err);
+        Swal.fire("Bloqueado", "Credencial Master Incorreta ou Inexistente.", "error");
+      }
     });
 });
 
