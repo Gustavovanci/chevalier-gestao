@@ -66,6 +66,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-screen").style.display = "flex";
     await carregarDadosSaaS(user.uid);
+    await atualizarMetricasAdmin(user.uid);
     
     // Oculta a Splash Screen suavemente DEPOIS de carregar os dados
     setTimeout(() => {
@@ -116,9 +117,26 @@ async function carregarDadosSaaS(uid) {
     atualizarListaFuncionarios();
     atualizarDashboard();
   } catch (error) {
-    console.error(error);
-  } finally {
+    console.error("Erro ao carregar dados SaaS:", error);
     toggleLoading(false);
+    Swal.fire("Erro", "Falha ao carregar dados do provedor. Tente recarregar a página.", "error");
+  }
+}
+
+// --- ADMIN TELEMETRY ---
+async function atualizarMetricasAdmin(uid) {
+  try {
+    const adminDocRef = doc(db, "nexuflow_metrics", uid);
+    const numFuncionarios = cacheFuncionarios.length;
+    
+    await setDoc(adminDocRef, {
+      empresa: companyName,
+      total_funcionarios: numFuncionarios,
+      last_active: new Date().toISOString()
+    }, { merge: true });
+    
+  } catch (err) {
+    console.warn("Telemetry ping failed. Ignoring.", err);
   }
 }
 

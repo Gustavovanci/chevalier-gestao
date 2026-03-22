@@ -1,0 +1,420 @@
+/* admin.css - NexuFlow Master Dashboard Styling */
+
+:root {
+  --bg-dark: #09090b;
+  --bg-panel: #18181b;
+  --bg-input: #27272a;
+  
+  --text-main: #f4f4f5;
+  --text-dim: #a1a1aa;
+  
+  --brand-core: #22d3ee; /* Cyan/Neon Blue for Admin Console feeling */
+  --brand-dark: #0891b2;
+  
+  --stroke: rgba(255, 255, 255, 0.08);
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- OVERLAYS --- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.loading-overlay.visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.shimmer {
+  animation: shimmer 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes shimmer {
+  from { filter: drop-shadow(0 0 4px var(--brand-core)) brightness(1); }
+  to { filter: drop-shadow(0 0 16px var(--brand-core)) brightness(1.5); }
+}
+
+/* --- LOGIN SESSAO --- */
+#login-screen {
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.glow-orb {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.login-container {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--stroke);
+  padding: 40px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 400px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+}
+
+.logo-mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--bg-input), #111111);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px auto;
+  border: 1px solid var(--stroke);
+}
+
+.logo-mark i {
+  font-size: 32px;
+  color: var(--brand-core);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header h1 {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+.login-header span {
+  color: var(--brand-core);
+}
+
+.login-header p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-flat {
+  background: var(--bg-dark);
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 54px;
+  transition: border-color 0.2s;
+}
+
+.input-flat:focus-within {
+  border-color: var(--brand-core);
+}
+
+.input-flat i {
+  color: var(--text-dim);
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.input-flat input {
+  background: transparent;
+  border: none;
+  flex: 1;
+  color: var(--text-main);
+  font-size: 1rem;
+  outline: none;
+  font-weight: 500;
+}
+
+.btn-master {
+  background: var(--brand-core);
+  color: var(--bg-dark);
+  border: none;
+  width: 100%;
+  height: 54px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.btn-master:hover {
+  background: #67e8f9;
+}
+
+.btn-master:active {
+  transform: scale(0.97);
+}
+
+/* --- DASHBOARD MASTER --- */
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--stroke);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-mark-small {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--stroke);
+}
+
+.logo-mark-small i {
+  color: var(--brand-core);
+  font-size: 24px;
+}
+
+.identity h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.identity p {
+  font-size: 0.75rem;
+  color: var(--brand-core);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.btn-icon {
+  background: var(--bg-dark);
+  border: 1px solid var(--stroke);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.btn-icon i {
+  font-size: 20px;
+}
+
+.dashboard-content {
+  padding: 32px;
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.kpi-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--stroke);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.kpi-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon i {
+  font-size: 32px;
+  color: #fff;
+}
+
+.brand-gradient {
+  background: linear-gradient(135deg, var(--brand-core), var(--brand-dark));
+}
+
+.kpi-info p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.kpi-info h3 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+/* --- TABLE --- */
+.table-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--stroke);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--stroke);
+}
+
+.table-header h3 {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.table-header p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  background: rgba(0,0,0,0.2);
+  padding: 16px 24px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--stroke);
+}
+
+.admin-table td {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--stroke);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.empresa-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-icon {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--brand-core);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uid-cell {
+  font-family: monospace;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  background: rgba(0,0,0,0.3);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media(max-width: 768px) {
+  .dashboard-content { padding: 16px; }
+  .kpi-grid { grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
+  .admin-topbar { padding: 16px; }
+  .identity h2 { font-size: 1rem; }
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>NexuFlow | Command Center</title>
+
+  <link rel="icon" type="image/png" href="./logo.png" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body>
+  <!-- LOADING OVERLAY -->
+  <div id="loading" class="loading-overlay">
+    <i class="ph-duotone ph-spinner shimmer" style="font-size: 40px; color: var(--brand-core);"></i>
+  </div>
+
+  <!-- LOGIN SECRETO (NEXUFLOW MASTER) -->
+  <div id="login-screen" class="screen active">
+    <div class="glow-orb"></div>
+    <div class="login-container">
+      <div class="logo-mark shimmer">
+        <i class="ph-fill ph-infinity"></i>
+      </div>
+      <div class="login-header">
+        <h1>NEXU<span>FLOW</span></h1>
+        <p>Master Command Center</p>
+      </div>
+
+      <form id="login-form">
+        <label>Credencial Master</label>
+        <div class="input-flat">
+          <i class="ph ph-envelope-simple"></i>
+          <input type="email" id="email" placeholder="admin@nexuflow.com" required autocomplete="username" />
+        </div>
+        
+        <label style="margin-top: 16px;">Passkey</label>
+        <div class="input-flat">
+          <i class="ph ph-lock-key"></i>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        
+        <button type="submit" class="btn-master" style="margin-top: 32px;">AUTENTICAR SISTEMA</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD MASTER -->
+  <div id="app-screen" class="screen" style="display: none;">
+    
+    <!-- TOP BAR -->
+    <header class="admin-topbar">
+      <div class="identity">
+        <div class="logo-mark-small">
+          <i class="ph-fill ph-infinity"></i>
+        </div>
+        <div>
+          <h2>NEXUFLOW</h2>
+          <p>Global Analytics</p>
+        </div>
+      </div>
+      <button class="btn-icon" id="btn-logout" title="Desconectar Painel Master">
+        <i class="ph ph-power"></i>
+      </button>
+    </header>
+
+    <main class="dashboard-content">
+      
+      <!-- KPIs -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon brand-gradient">
+            <i class="ph-duotone ph-buildings"></i>
+          </div>
+          <div class="kpi-info">
+            <p>Empresas Ativas</p>
+            <h3 id="dash-empresas">--</h3>
+          </div>
+        </div>
+        
+        <div class="kpi-card">
+          <div class="kpi-icon brand-gradient">
+            <i class="ph-duotone ph-users-three"></i>
+          </div>
+          <div class="kpi-info">
+            <p>Vidas Gerenciadas</p>
+            <h3 id="dash-vidas">--</h3>
+          </div>
+        </div>
+        
+        <div class="kpi-card">
+          <div class="kpi-icon brand-gradient" style="background: linear-gradient(135deg, #10b981, #047857);">
+            <i class="ph-duotone ph-activity"></i>
+          </div>
+          <div class="kpi-info">
+            <p>Status da Nuvem</p>
+            <h3 style="color: #10b981;">Online</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- TABLE DE ENGAJAMENTO -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Mapeamento de Inquilinos (Tenants)</h3>
+          <p>Lista em tempo real dos clientes conectados ao Chevalier SaaS.</p>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Empresa (Fantasia)</th>
+                <th>Funcionários (Base)</th>
+                <th>Último Ping (Acesso)</th>
+                <th>UID</th>
+              </tr>
+            </thead>
+            <tbody id="lista-empresas">
+              <!-- JS RENDERIZA AQUI -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- CORE LOGIC -->
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
